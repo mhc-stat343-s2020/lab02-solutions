@@ -1,0 +1,60 @@
+---
+title: "Stat 343 MLE Practice: Saplings"
+output:
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The code below reads in the seedlings data:
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+seedlings <- read_table("http://www.evanlray.com/data/lavine_intro_stat_thought/seedlings.txt") %>%
+  select(quadrat = Block,
+    old_1991 = `91`,
+    old_1992 = `92-t`,
+    old_1993 = `93-t`,
+    old_1994 = `94-t`,
+    old_1995 = `95-t`,
+    old_1996 = `96-t`,
+    old_1997 = `97-t`,
+    new_1992 = `92-1`,
+    new_1993 = `93-1`,
+    new_1994 = `94-1`,
+    new_1995 = `95-1`,
+    new_1996 = `96-1`,
+    new_1997 = `97-1`
+  )
+```
+
+#### Find the maximum likelihood estimate for the model parameter.
+
+```{r}
+seedlings %>%
+  summarize(
+    mean_count = mean(new_1993)
+  )
+# ...or...
+mean(seedlings$new_1993)
+```
+
+#### Create a density histogram of the data, and overlay on it a representation of the probability mass function for your chosen model based on the maximum likelihood parameter estimate.  (For this second layer, you might set up a data frame with values of x and the corresponding probability mass function, and use `geom_point` and/or `geom_line`.)
+
+```{r}
+poisson_fit <- data.frame(
+  x = seq(from = 0, to = 10),
+  pmf = dpois(seq(from = 0, to = 10), lambda = 0.7333333)
+)
+
+ggplot(data = seedlings, mapping = aes(x = new_1993, y = ..density..)) +
+  geom_histogram(binwidth = 1) +
+  geom_point(data = poisson_fit, mapping = aes(x = x, y = pmf), color = "red") +
+  geom_line(data = poisson_fit, mapping = aes(x = x, y = pmf), color = "red")
+```
